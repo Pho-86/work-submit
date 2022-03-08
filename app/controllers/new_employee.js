@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { genSaltSync, hashSync } = require('bcrypt');
-const create = require('../models/new_employee');
+const ModelEmployee = require('../models/new_employee');
 
 
 router.post('/signup', (res,req, next) =>{
@@ -14,8 +14,7 @@ router.post('/signup', (res,req, next) =>{
         
     )
       {  req.body.password = hashSync(req.body.password, salt);
-        console.log(req.body);
-        create.post_signup(req.body,(req, result)=> {
+        ModelEmployee.post_signup(req.body,(req, result)=> {
             if (err){
                 console.log(err);
                 return res.status(500).json({
@@ -30,4 +29,35 @@ router.post('/signup', (res,req, next) =>{
         });
     }
     });
+    router.post ('/login',(req, res) => {
+        
+        ModelEmployee.getUserByUserEmail(req.body.email, (err, results) => {
+          if (err) {
+            console.log(err);
+          }
+          if (!results) {
+            return res.json({
+              success: 0,
+              data: "Invalid email or password"
+            });
+          }
+          const result = compareSync(body.password, results.password);
+          if (result) {
+            results.password = undefined;
+            const jsontoken = sign({ result: results }, "qwe1234", {
+              expiresIn: "1h"
+            });
+            return res.json({
+              success: 1,
+              message: "login successfully",
+              token: jsontoken
+            });
+          } else {
+            return res.json({
+              success: 0,
+              data: "Invalid email or password"
+            });
+          }
+        });
+      });
     module.exports = router;

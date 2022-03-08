@@ -19,6 +19,19 @@ const connect = require('../../config/new_db_connect');
         }
         )
     });
+    const getUserByUserEmail = ((email, callBack) => {
+        connect.query(
+          `select * from employees where email = ?`,
+          [email],
+          (error, results, fields) => {
+            if (error) {
+              callBack(error);
+            }
+            return callBack(null, results[0]);
+          }
+        );
+      });
 module.exports={
-    post_signup
+    post_signup,
+    getUserByUserEmail
 }
